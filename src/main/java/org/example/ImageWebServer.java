@@ -3,19 +3,13 @@ package org.example;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.SimpleFileServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.InetSocketAddress;
-import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.FileHandler;
 
 public class ImageWebServer {
     private static final Logger logger = LoggerFactory.getLogger(ImageWebServer.class);
@@ -24,7 +18,7 @@ public class ImageWebServer {
     public static void startServer() throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
         server.createContext("/", new StatusHandler());
-        server.createContext("/images", new AssetHandler("src/main/resources/web/images"));
+        server.createContext("/images", new AssetHandler("assets"));
         ExecutorService executor = Executors.newFixedThreadPool(MAX_CONNECTIONS);
         server.setExecutor(executor);
         server.start();
@@ -40,9 +34,7 @@ public class ImageWebServer {
 
         @Override
         public void handle(HttpExchange exchange) throws IOException {
-            logger.info("access images");
             String filePath = baseDirectory + exchange.getRequestURI().getPath().replace("/images", "");
-            logger.info("filePath {}", filePath);
             File file = new File(filePath);
             if(file.exists() && !file.isDirectory()) {
                 exchange.sendResponseHeaders(200, file.length());
