@@ -37,7 +37,6 @@ public class HttpStatusImageDownloader {
                 logger.info("Downloading image from the web.");
                 encodedImage = downloadAndSaveImage(imageUrl);
             }
-            logger.info("Base64 Image: {}", encodedImage);
 
         } catch (Exception e) {
             logger.error("Failed to download image for status code {}", code, e);
@@ -45,7 +44,9 @@ public class HttpStatusImageDownloader {
     }
 
     private String getCachedImage(String imageUrl) {
+        logger.info("retreiving image from cache...");
         WeakReference<CachedImage> cachedRef = imageCache.get(imageUrl);
+        logger.info("cached image: {}", cachedRef);
         if (cachedRef != null) {
             CachedImage cachedImage = cachedRef.get();
             if (cachedImage != null && !cachedImage.isExpired()) {
