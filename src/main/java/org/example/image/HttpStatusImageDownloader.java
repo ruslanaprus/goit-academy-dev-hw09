@@ -23,21 +23,26 @@ public class HttpStatusImageDownloader {
     private static final String IMAGE_DIR = "assets/";
     private static final Map<String, WeakReference<CachedImage>> imageCache = new WeakHashMap<>();
 
-    public void downloadStatusImage(int code) {
-        HttpClient client = HttpClient.newHttpClient();
-        HttpUtil httpUtil = new HttpUtil(client);
-        HttpStatusChecker statusChecker = new HttpStatusChecker(httpUtil);
+    private final HttpStatusChecker statusChecker;
+    private final HttpClient client;
+    private final HttpUtil httpUtil;
 
+    public HttpStatusImageDownloader() {
+        this.client = HttpClient.newHttpClient();
+        this.httpUtil = new HttpUtil(client);
+        this.statusChecker = new HttpStatusChecker(new HttpUtil(client));
+    }
+
+    public void downloadStatusImage(int code) {
         try {
             String imageUrl = statusChecker.getStatusImage(code);
             logger.info("Image URL: {}", imageUrl);
 
-            String encodedImage = getCachedImage(imageUrl);
-            if (encodedImage != null) {
-                logger.info("Image retrieved from cache.");
-            } else {
+            String cachedImage = getCachedImage(imageUrl);
+            logger.info("Image retrieved from cache.");
+            if (cachedImage == null) {
                 logger.info("Downloading image from the web.");
-                encodedImage = downloadAndSaveImage(imageUrl);
+                cachedImage = downloadAndSaveImage(imageUrl);
             }
 
         } catch (Exception e) {
@@ -75,24 +80,5 @@ public class HttpStatusImageDownloader {
         imageCache.put(imageUrl, new WeakReference<>(new CachedImage(base64Image)));
 
         return base64Image;
-    }
-
-    private static class CachedImage {
-        private final String base64Image;
-        private final long timestamp;
-
-        public CachedImage(String base64Image) {
-            this.base64Image = base64Image;
-            this.timestamp = System.currentTimeMillis();
-        }
-
-        public String getBase64Image() {
-            return base64Image;
-        }
-
-        public boolean isExpired() {
-            // Check if the cached image is older than 24 hours
-            return System.currentTimeMillis() - timestamp > 24 * 60 * 60 * 1000;
-        }
     }
 }

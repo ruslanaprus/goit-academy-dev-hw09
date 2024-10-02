@@ -23,7 +23,7 @@ public class HttpStatusChecker {
 
         try {
             logger.info("Sending HEAD request to URI: {}", uri);
-            HttpResponse<String> response = httpUtil.sendHeadRequest(uri);
+            HttpResponse<String> response = httpUtil.checkIfUrlExists(uri);
 
             if (response != null && response.statusCode() == 200) {
                 logger.info("Successfully retrieved image for status code: {}", code);

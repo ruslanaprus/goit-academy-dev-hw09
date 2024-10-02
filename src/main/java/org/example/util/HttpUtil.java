@@ -18,7 +18,7 @@ public class HttpUtil {
         this.client = client;
     }
 
-    public HttpResponse<String> sendHeadRequest(URI uri) {
+    public HttpResponse<String> checkIfUrlExists(URI uri) {
         try {
             logger.info("Sending HEAD request to URI: {}", uri);
             HttpRequest request = HttpRequest.newBuilder()
