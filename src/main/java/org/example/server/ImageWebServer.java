@@ -13,7 +13,7 @@ public class ImageWebServer {
     private static final Logger logger = LoggerFactory.getLogger(ImageWebServer.class);
     public static final int MAX_CONNECTIONS = 100;
     public static final int DEFAULT_PORT = 8080;
-    public static final String IMAGE_DIR = "assets/";
+    public static final String IMAGE_DIR = "assets";
 
     public static void startServer() throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(DEFAULT_PORT), 0);

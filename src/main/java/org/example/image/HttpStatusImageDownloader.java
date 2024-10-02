@@ -21,7 +21,7 @@ import java.util.WeakHashMap;
 
 public class HttpStatusImageDownloader {
     private static final Logger logger = LoggerFactory.getLogger(HttpStatusImageDownloader.class);
-    private static final String IMAGE_DIR = "assets/";
+    private static final String IMAGE_DIR = "assets";
     private static final Map<String, WeakReference<CachedImage>> imageCache = new WeakHashMap<>();
 
     private final HttpStatusChecker statusChecker;
