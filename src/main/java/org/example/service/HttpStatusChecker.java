@@ -1,5 +1,6 @@
-package org.example;
+package org.example.service;
 
+import org.example.util.HttpUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.server.ImageWebServer;
+
 import java.io.IOException;
 
 public class AppLauncher {

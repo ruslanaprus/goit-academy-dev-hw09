@@ -1,5 +1,7 @@
-package org.example;
+package org.example.image;
 
+import org.example.service.HttpStatusChecker;
+import org.example.util.HttpUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

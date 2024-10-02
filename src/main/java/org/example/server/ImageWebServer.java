@@ -1,8 +1,9 @@
-package org.example;
+package org.example.server;
 
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
+import org.example.image.HttpStatusImageDownloader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
