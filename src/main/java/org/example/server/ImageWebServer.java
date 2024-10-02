@@ -12,14 +12,16 @@ import java.util.concurrent.Executors;
 public class ImageWebServer {
     private static final Logger logger = LoggerFactory.getLogger(ImageWebServer.class);
     public static final int MAX_CONNECTIONS = 100;
+    public static final int DEFAULT_PORT = 8080;
+    public static final String IMAGES_DIRECTORY = "assets";
 
     public static void startServer() throws IOException {
-        HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+        HttpServer server = HttpServer.create(new InetSocketAddress(DEFAULT_PORT), 0);
         server.createContext("/", new StatusHandler());
-        server.createContext("/images", new AssetHandler("assets"));
+        server.createContext("/images", new AssetHandler(IMAGES_DIRECTORY));
         ExecutorService executor = Executors.newFixedThreadPool(MAX_CONNECTIONS);
         server.setExecutor(executor);
         server.start();
-        logger.info("Server started at http://localhost:8080");
+        logger.info("Server started at http://localhost:{}", DEFAULT_PORT);
     }
 }
