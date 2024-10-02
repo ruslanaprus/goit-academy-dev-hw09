@@ -1,16 +1,16 @@
 package org.example.image;
 
 public class CachedImage {
-    private final String base64Image;
+    private final byte[] imageBytes;
     private final long timestamp;
 
-    public CachedImage(String base64Image) {
-        this.base64Image = base64Image;
+    public CachedImage(byte[] imageBytes) {
+        this.imageBytes = imageBytes;
         this.timestamp = System.currentTimeMillis();
     }
 
-    public String getBase64Image() {
-        return base64Image;
+    public byte[] getImageBytes() {
+        return imageBytes;
     }
 
     public boolean isExpired() {

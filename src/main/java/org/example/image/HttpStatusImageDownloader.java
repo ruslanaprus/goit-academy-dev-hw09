@@ -14,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,13 +23,11 @@ public class HttpStatusImageDownloader {
     private static final Map<String, CachedImage> imageCache = new ConcurrentHashMap<>();
 
     private final HttpStatusChecker statusChecker;
-    private final HttpClient client;
     private final HttpUtil httpUtil;
 
     public HttpStatusImageDownloader() {
-        this.client = HttpClient.newHttpClient();
-        this.httpUtil = new HttpUtil(client);
-        this.statusChecker = new HttpStatusChecker(new HttpUtil(client));
+        this.httpUtil = new HttpUtil(HttpClient.newHttpClient());
+        this.statusChecker = new HttpStatusChecker(httpUtil);
     }
 
     public void downloadStatusImage(int code) {
@@ -38,25 +35,24 @@ public class HttpStatusImageDownloader {
             String imageUrl = statusChecker.getStatusImage(code);
             logger.info("Image URL: {}", imageUrl);
 
-            String cachedImage = getCachedImage(imageUrl);
+            byte[] cachedImage = getCachedImage(imageUrl);
             if (cachedImage == null) {
                 logger.info("Downloading image from the web.");
                 cachedImage = downloadAndSaveImage(imageUrl);
             }
-
         } catch (Exception e) {
             logger.error("Failed to download image for status code {}", code, e);
         }
     }
 
-    private String getCachedImage(String imageUrl) {
+    private byte[] getCachedImage(String imageUrl) {
         logger.info("retreiving image from cache...");
         CachedImage cachedImage = imageCache.get(imageUrl);
         logger.info("cached image: {}", cachedImage);
         if (cachedImage != null) {
-            logger.info("Cached image found: {}", imageUrl);
             if (!cachedImage.isExpired()) {
-                return cachedImage.getBase64Image();
+                logger.info("Cached image found for URL: {}", imageUrl);
+                return cachedImage.getImageBytes();
             } else {
                 logger.info("Cached image expired for URL: {}", imageUrl);
                 imageCache.remove(imageUrl);
@@ -65,7 +61,7 @@ public class HttpStatusImageDownloader {
         return null;
     }
 
-    private String downloadAndSaveImage(String imageUrl) throws IOException {
+    private byte[] downloadAndSaveImage(String imageUrl) throws IOException {
         URL url = new URL(imageUrl);
         String fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
         Path imagePath = Paths.get(IMAGE_DIR).resolve(fileName);
@@ -89,13 +85,13 @@ public class HttpStatusImageDownloader {
             // move temporary file to final destination
             Files.move(tempFilePath, imagePath, StandardCopyOption.REPLACE_EXISTING);
 
-            // encode to Base64 directly from the buffer (don't need to read the file again)
-            String base64Image = Base64.getEncoder().encodeToString(buffer.toByteArray());
+            // add bytes to array directly from the buffer (don't need to read the file again)
+            byte[] imageBytes = buffer.toByteArray();
 
             // cache the image
-            imageCache.put(imageUrl, new CachedImage(base64Image));
+            imageCache.put(imageUrl, new CachedImage(imageBytes));  // Cache binary data
 
-            return base64Image;
+            return imageBytes;
         } catch (IOException e) {
             // delete temporary file if something goes wrong
             Files.deleteIfExists(tempFilePath);
