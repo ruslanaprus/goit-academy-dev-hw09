@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.net.http.HttpClient;
 import java.nio.file.Files;
@@ -17,12 +16,12 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Base64;
 import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class HttpStatusImageDownloader {
     private static final Logger logger = LoggerFactory.getLogger(HttpStatusImageDownloader.class);
     private static final String IMAGE_DIR = "assets";
-    private static final Map<String, WeakReference<CachedImage>> imageCache = new WeakHashMap<>();
+    private static final Map<String, CachedImage> imageCache = new ConcurrentHashMap<>();
 
     private final HttpStatusChecker statusChecker;
     private final HttpClient client;
@@ -52,12 +51,15 @@ public class HttpStatusImageDownloader {
 
     private String getCachedImage(String imageUrl) {
         logger.info("retreiving image from cache...");
-        WeakReference<CachedImage> cachedRef = imageCache.get(imageUrl);
-        logger.info("cached image: {}", cachedRef);
-        if (cachedRef != null) {
-            CachedImage cachedImage = cachedRef.get();
-            if (cachedImage != null && !cachedImage.isExpired()) {
+        CachedImage cachedImage = imageCache.get(imageUrl);
+        logger.info("cached image: {}", cachedImage);
+        if (cachedImage != null) {
+            logger.info("Cached image found: {}", imageUrl);
+            if (!cachedImage.isExpired()) {
                 return cachedImage.getBase64Image();
+            } else {
+                logger.info("Cached image expired for URL: {}", imageUrl);
+                imageCache.remove(imageUrl);
             }
         }
         return null;
@@ -91,7 +93,7 @@ public class HttpStatusImageDownloader {
             String base64Image = Base64.getEncoder().encodeToString(buffer.toByteArray());
 
             // cache the image
-            imageCache.put(imageUrl, new WeakReference<>(new CachedImage(base64Image)));
+            imageCache.put(imageUrl, new CachedImage(base64Image));
 
             return base64Image;
         } catch (IOException e) {
