@@ -18,12 +18,27 @@ public class StatusHandler implements RequestHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        HttpStatusImageDownloader downloader = new HttpStatusImageDownloader();
         String path = exchange.getRequestURI().getPath();
         String statusCode = path.substring(path.lastIndexOf('/') + 1);
-        downloader.downloadStatusImage(Integer.parseInt(statusCode));
 
-        String response = """
+        try {
+            imageDownloader.downloadStatusImage(Integer.parseInt(statusCode));
+            String response = generateHtmlResponse(statusCode);
+            byte[] responseBytes = response.getBytes();
+            exchange.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
+            exchange.getResponseHeaders().set("Content-Length", String.valueOf(responseBytes.length));
+            exchange.sendResponseHeaders(200, responseBytes.length);
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(responseBytes);
+            }
+        } catch (NumberFormatException e) {
+            logger.error("Invalid status code: {}", statusCode, e);
+            exchange.sendResponseHeaders(400, -1);
+        }
+    }
+
+    private String generateHtmlResponse(String statusCode) {
+        return """
                 <!DOCTYPE html>
                      <html lang="en">
                      <head>
@@ -64,13 +79,5 @@ public class StatusHandler implements RequestHandler {
                         </body>
                         </html>
                         """;
-
-        byte[] responseBytes = response.getBytes();
-        exchange.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
-        exchange.getResponseHeaders().set("Content-Length", String.valueOf(responseBytes.length));
-        exchange.sendResponseHeaders(200, responseBytes.length);
-        try (OutputStream os = exchange.getResponseBody()) {
-            os.write(responseBytes);
-        }
     }
 }
