@@ -1,7 +1,7 @@
 package org.example.server;
 
 import com.sun.net.httpserver.HttpExchange;
-import org.example.image.HttpStatusImageDownloader;
+import org.example.image.ImageManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,10 +10,10 @@ import java.io.OutputStream;
 
 public class StatusHandler implements RequestHandler {
     private static final Logger logger = LoggerFactory.getLogger(StatusHandler.class);
-    private final HttpStatusImageDownloader imageDownloader;
+    private final ImageManager imageManager;
 
     public StatusHandler() {
-        this.imageDownloader = new HttpStatusImageDownloader();
+        this.imageManager = new ImageManager();
     }
 
     @Override
@@ -22,8 +22,10 @@ public class StatusHandler implements RequestHandler {
         String statusCode = path.substring(path.lastIndexOf('/') + 1);
 
         try {
-            imageDownloader.downloadStatusImage(Integer.parseInt(statusCode));
+            int code = Integer.parseInt(statusCode);
+            imageManager.getImage(code);
             String response = generateHtmlResponse(statusCode);
+
             byte[] responseBytes = response.getBytes();
             exchange.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
             exchange.getResponseHeaders().set("Content-Length", String.valueOf(responseBytes.length));
