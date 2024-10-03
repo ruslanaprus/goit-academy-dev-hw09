@@ -32,3 +32,10 @@ tasks.named('jar') {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
+
+tasks.register('run', JavaExec) {
+    group = 'application'
+    description = 'Run the main class of the project'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'org.example.AppLauncher'
+}
