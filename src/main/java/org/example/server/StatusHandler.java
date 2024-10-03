@@ -62,10 +62,11 @@ public class StatusHandler implements RequestHandler {
                     <style>
                         @font-face {
                                 font-family: 'CustomFont';
-                                src: url('src/main/resources/fonts/Cattie-Regular.ttf') format('truetype');
+                                src: url('/fonts/Cattie-Regular.ttf') format('truetype');
                             }
                         body {
-                            font-family: 'CustomFont', Arial, sans-serif;
+                            font-family: Arial, sans-serif;
+                            font-size: 1.5rem;
                             text-align: center;
                             padding-top: 50px;
                         }
@@ -79,6 +80,9 @@ public class StatusHandler implements RequestHandler {
                         }
                         h1 {
                             color: #333;
+                            font-family: 'CustomFont', Arial, sans-serif;
+                            font-size: 6rem;
+                            margin: 5px;
                         }
                     </style>
                 </head>
@@ -104,10 +108,11 @@ public class StatusHandler implements RequestHandler {
                          <style>
                             @font-face {
                                 font-family: 'CustomFont';
-                                src: url('src/main/resources/fonts/Cattie-Regular.ttf') format('truetype');
+                                src: url('/fonts/Cattie-Regular.ttf') format('truetype');
                             }
                             body {
-                                font-family: 'CustomFont', Arial, sans-serif;
+                                font-family: Arial, sans-serif;
+                                font-size: 1.5rem;
                                 text-align: center;
                                 padding-top: 50px;
                             }
@@ -121,6 +126,9 @@ public class StatusHandler implements RequestHandler {
                              }
                              h1 {
                                  color: #333;
+                                 font-family: 'CustomFont', Arial, sans-serif;
+                                 font-size: 6rem;
+                                 margin: 5px;
                              }
                          </style>
                      </head>

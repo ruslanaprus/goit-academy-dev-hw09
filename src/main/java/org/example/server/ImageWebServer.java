@@ -18,6 +18,7 @@ public class ImageWebServer {
         HttpServer server = HttpServer.create(new InetSocketAddress(DEFAULT_PORT), 0);
         server.createContext("/", new StatusHandler());
         server.createContext("/images", new AssetHandler());
+        server.createContext("/fonts", new FontHandler());
         ExecutorService executor = Executors.newFixedThreadPool(MAX_CONNECTIONS);
         server.setExecutor(executor);
         server.start();
