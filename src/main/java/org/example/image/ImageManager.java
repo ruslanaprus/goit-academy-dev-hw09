@@ -15,6 +15,7 @@ import java.nio.file.StandardCopyOption;
 public class ImageManager {
     private static final Logger logger = LoggerFactory.getLogger(ImageManager.class);
     private static final String IMAGE_DIR = "assets";
+    private static final String DEFAULT_IMG = "src/main/resources/error/not_found.jpeg";
 
     private final HttpStatusChecker statusChecker;
 
@@ -76,8 +77,16 @@ public class ImageManager {
             if (tempFilePath != null) {
                 Files.deleteIfExists(tempFilePath);
             }
-            logger.error("Failed to download image for status code: {}", statusCode, e);
-            throw new IOException("Failed to download image", e);
+            logger.error("Failed to download image for status code: {}", statusCode, e.getMessage());
         }
+        // serve the default 'not found' image in case of any error
+        Path fallbackImagePath = Paths.get(DEFAULT_IMG);
+        byte[] fallbackImageBytes = null;
+        if (Files.exists(fallbackImagePath)) {
+            fallbackImageBytes = Files.readAllBytes(fallbackImagePath);
+        } else {
+            logger.info("Fallback image not found");
+        }
+        return fallbackImageBytes;
     }
 }
